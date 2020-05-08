@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+    <group
+        android:id="@+id/menu_lnb_normal_user_buttons"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_lnb_action_chformat"
+            android:title="Change format" />
+        <item
+            android:id="@+id/menu_lnb_action_colorset"
+            android:title="Customize colors" />
+    </group>
+    <group
+        android:id="@+id/menu_lnb_change_properties"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_lnb_action_settings"
+            android:title="Settings"/>
+    </group>
+</menu>
