@@ -1,18 +1,13 @@
 package es.ucm.fdi.moodcalendar.customView;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Point;
-import android.os.Parcelable;
+import android.os.Build;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -20,24 +15,25 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import es.ucm.fdi.moodcalendar.R;
 import es.ucm.fdi.moodcalendar.dataModel.DateWithBackground;
 
+/**
+ * Custom Calendar View
+ *
+ * @author Alejandro Cancelo Correia
+ * */
 public class CalendarView extends LinearLayout {
     private static final String TAG = "CalendarView";
     private final int MAX_ROWS = 6;
     private final int MAX_COLUMNS = 7;
 
-    private LinearLayout weekDaysList;
     private TextView headerYearText;
     private TextView headerMonthText;
     //arrow left
@@ -47,16 +43,24 @@ public class CalendarView extends LinearLayout {
     //Calendar body
     private GridView calendarBody;
     private CalendarAdapter bodyDataAdapter;
-    private Calendar currentCalendar = Calendar.getInstance();
+    private Calendar currentCalendar;
+    private String[] MONTH_TITLES;
 
-
+    //TODO: CalendarView: Document each method
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        currentCalendar = Calendar.getInstance();
+        MONTH_TITLES = new String[]{
+                "January", "February", "March", "April", "May", "June", "July",
+                "August", "September", "October", "November", "December"
+        };
     }
 
     public void createView(@NonNull ArrayList<DateWithBackground> dateList){
         if(dateList.isEmpty()){
-            dateList = obtainCalendarData();
+            //TODO: MVV-1: Should it call ViewModel method to retrieve the current
+            //  values inside the database?
+            dateList = obtainCalendarData(CalendarAction.CURRENT);
         }
 
         initControl(getContext(), dateList);
@@ -64,20 +68,21 @@ public class CalendarView extends LinearLayout {
         setId(View.generateViewId());
     }
 
-    /**
-     * Display dates correctly in grid
-     */
-    public void updateCalendar(HashSet<Date> events) {
-
+    private ArrayList<DateWithBackground> obtainCalendarData(int month){
+        currentCalendar.set(Calendar.MONTH, month);
+        return obtainCalendarData(CalendarAction.CURRENT);
     }
 
-    private ArrayList<DateWithBackground> obtainCalendarData(){
+    private ArrayList<DateWithBackground> obtainCalendarData(CalendarAction selectedMonth){
+        int currentMonth = currentCalendar.get(Calendar.MONTH);
+        currentCalendar.set(Calendar.MONTH,  currentMonth + selectedMonth.value);
+
         int currentDay = currentCalendar.get(Calendar.DAY_OF_MONTH);
         ArrayList<DateWithBackground> monthDays = new ArrayList<>();
 
         for(int i = 0; i < MAX_ROWS ; i++){
             for (int j = 0; j < MAX_COLUMNS; j++){
-                monthDays.add(new DateWithBackground(0));
+                monthDays.add(new DateWithBackground(currentCalendar.get(Calendar.YEAR), currentMonth+1, 0));
             }
         }
 
@@ -103,7 +108,7 @@ public class CalendarView extends LinearLayout {
 
         //we fill the rest
         int columnRestOfDays;
-        int maxDayOfCurrentMonth = currentCalendar.getMaximum(Calendar.DAY_OF_MONTH);
+        int maxDayOfCurrentMonth = currentCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 
         for(int rowRestOfDays = 1; rowRestOfDays < MAX_ROWS; rowRestOfDays++){
             columnRestOfDays = 0;
@@ -143,12 +148,45 @@ public class CalendarView extends LinearLayout {
      * */
     private void assignUiElements() {
         // layout is inflated, assign local variables to components
-        weekDaysList = findViewById(R.id.CalendarBodyMetaData);
         headerYearText = findViewById(R.id.CaHeDateInfoYear);
         headerMonthText = findViewById(R.id.CaHeDateInfoMonth);
         btnPrev = findViewById(R.id.CaHeaderArrowLeft);
         btnNext = findViewById(R.id.CaHeaderArrowRight);
         calendarBody = findViewById(R.id.CalendarBody);
+
+        createBtnListeners();
+    }
+
+    private void createBtnListeners(){
+        btnPrev.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //call to update view
+                Log.d(TAG, "onClick: click previous month");
+                bodyDataAdapter.changeCurrentDates(obtainCalendarData(CalendarAction.PREVIOUS));
+                changeMonthText();
+            }
+        });
+        btnNext.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //call to update view
+                Log.d(TAG, "onClick: clicked next month");
+                bodyDataAdapter.changeCurrentDates(obtainCalendarData(CalendarAction.NEXT));
+                changeMonthText();
+            }
+        });
+    }
+
+    private void changeMonthText() {
+        //this value will be in the range of 0 to 11
+        int currentMonth = currentCalendar.get(Calendar.MONTH);
+        headerMonthText.setText(MONTH_TITLES[currentMonth]);
+    }
+
+    private void changeYearText(){
+        int currentYear = currentCalendar.get(Calendar.YEAR);
+        headerYearText.setText(String.valueOf(currentYear));
     }
 
     /**
@@ -167,11 +205,15 @@ public class CalendarView extends LinearLayout {
         setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0));
         assignUiElements();
         attachAdapter(attrs);
+        changeMonthText();
+        changeYearText();
     }
 
     private void attachAdapter(ArrayList<DateWithBackground> datesList) {
         bodyDataAdapter = new CalendarAdapter(getContext(), 0, datesList);
 
+        //TODO: all this calculations could be passed to our CalendarAdapter. This way
+        // we could isolate this view an make it more generic
         float window = Resources.getSystem().getDisplayMetrics().heightPixels;
         float itemRowHeight = getResources().getDimension(R.dimen.calendar_days_row_height);
 
@@ -218,10 +260,39 @@ public class CalendarView extends LinearLayout {
 
     /*======================= TEST METHODS =======================*/
 
-    public List<DateWithBackground> obtainCalendarDataUNIT_TEST(){
-        return obtainCalendarData();
+    public ArrayList<DateWithBackground> obtainCalendarDataGivenMonthUNIT_TEST(int month){
+        return obtainCalendarData(month);
     }
 
+    public ArrayList<DateWithBackground> obtainCalendarDataUNIT_TEST(){
+        return obtainCalendarData(CalendarAction.CURRENT);
+    }
 
+    public String obtainCalendarActionNameUNIT_TEST(){
+        return String.format("first: %s\tsecond: %s\tthird: %s", CalendarAction.CURRENT,
+                                                               CalendarAction.NEXT,
+                                                               CalendarAction.PREVIOUS);
+    }
+
+    public int obtainCalendarActionValueUNIT_TEST(int who){
+        switch (who){
+            case 0: return CalendarAction.CURRENT.value;
+            case 1: return CalendarAction.NEXT.value;
+            case 2: return CalendarAction.PREVIOUS.value;
+            default:return -2;
+        }
+    }
+
+    private enum CalendarAction{
+        CURRENT (0),
+        NEXT (1),
+        PREVIOUS (-1);
+
+        private final int value;
+
+        CalendarAction(int value) {
+            this.value = value;
+        }
+    }
 
 }

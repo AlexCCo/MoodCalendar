@@ -1,6 +1,7 @@
 package es.ucm.fdi.moodcalendar.customViewTesting;
 
 import android.app.Instrumentation;
+import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -13,6 +14,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import es.ucm.fdi.moodcalendar.MainActivity;
@@ -31,6 +34,7 @@ import es.ucm.fdi.moodcalendar.dataModel.DateWithBackground;
  * */
 @RunWith(AndroidJUnit4.class)
 public class CalendarViewTest {
+    private static final String TAG = "CalendarViewTest";
     private Instrumentation instrumentation;
     private CalendarView calendarView;
 
@@ -48,5 +52,56 @@ public class CalendarViewTest {
         List<DateWithBackground> result = calendarView.obtainCalendarDataUNIT_TEST();
 
         Assert.assertNotNull(result);
+    }
+
+    @Test
+    public void should_return_correct_name_and_value(){
+        String value = calendarView.obtainCalendarActionNameUNIT_TEST();
+        String expected = "first: CURRENT\tsecond: NEXT\tthird: PREVIOUS";
+
+        Assert.assertEquals(expected, value);
+
+        int intValue = calendarView.obtainCalendarActionValueUNIT_TEST(0);
+
+        Assert.assertEquals(0, intValue);
+
+        intValue = calendarView.obtainCalendarActionValueUNIT_TEST(1);
+
+        Assert.assertEquals(1, intValue);
+
+        intValue = calendarView.obtainCalendarActionValueUNIT_TEST(2);
+
+        Assert.assertEquals(-1, intValue);
+    }
+
+    @Test
+    public void should_return_correct_list_if_given_month(){
+        Calendar instanceOf = Calendar.getInstance();
+        int[] staticMonthQualifiers = new int[]{
+                Calendar.JANUARY, Calendar.FEBRUARY, Calendar.MARCH, Calendar.APRIL, Calendar.MAY,
+                Calendar.JUNE, Calendar.JULY, Calendar.AUGUST, Calendar.SEPTEMBER, Calendar.OCTOBER,
+                Calendar.NOVEMBER, Calendar.DECEMBER
+        };
+
+        for(int i = 0; i< 12; i++) {
+            instanceOf.set(Calendar.MONTH, staticMonthQualifiers[i]);
+            ArrayList<DateWithBackground> monthDates = calendarView.obtainCalendarDataGivenMonthUNIT_TEST(staticMonthQualifiers[i]);
+            int days = numberOfDays(monthDates);
+            Log.d(TAG, String.format("should_return_correct_list_if_given_month: month %d calendar %d | calculated %d ", i+1, instanceOf.getActualMaximum(Calendar.DAY_OF_MONTH), days));
+            Assert.assertEquals(instanceOf.getActualMaximum(Calendar.DAY_OF_MONTH), days);
+        }
+
+    }
+
+    private int numberOfDays(ArrayList<DateWithBackground> list){
+        int numberOfDays = 0;
+
+        for(DateWithBackground date: list){
+            if (date.getDay()!=0){
+                numberOfDays++;
+            }
+        }
+
+        return numberOfDays;
     }
 }

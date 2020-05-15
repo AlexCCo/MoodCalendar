@@ -5,8 +5,6 @@
     android:id="@+id/mainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5122A8"
-
     tools:context=".MainActivity">
 
 
@@ -29,9 +27,8 @@
                 android:id="@+id/top_toolbar"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/custom_action_bar_size"
-                android:background="@color/colorPrimary"
                 android:elevation="4dp"
-                android:theme="?attr/actionBarTheme"
+                android:background="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.50"

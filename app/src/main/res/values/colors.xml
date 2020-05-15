@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--Standard theme
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-    
+    -->
+    <!-- Custom theme -->
+    <color name="colorPrimary">#4dd0e1</color>
+    <color name="colorPrimaryDark">#009faf</color>
+    <color name="colorAccent">#88ffff</color>
+
     <!--Standar Mood colors-->
     <color name="teal_green">#006d5b</color>
     <color name="olive_green">#6B8E23</color>

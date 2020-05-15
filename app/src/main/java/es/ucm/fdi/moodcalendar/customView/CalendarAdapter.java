@@ -17,11 +17,19 @@ import java.util.List;
 import es.ucm.fdi.moodcalendar.R;
 import es.ucm.fdi.moodcalendar.dataModel.DateWithBackground;
 
+
+/**
+ * Our custom Calendar view (CalendarView class) needs an adapter to render the cells
+ * representing days of the month
+ *
+ * @author Alejandro Cancelo Correia
+ * */
 public class CalendarAdapter extends ArrayAdapter<DateWithBackground> {
     private static final String TAG = "CalendarAdapter";
     private ArrayList<DateWithBackground> currentDates;
     private int parentHeight;
 
+    //TODO: CalendarAdapter: Document each method
     public CalendarAdapter(@NonNull Context context, int resource, @NonNull ArrayList<DateWithBackground> objects) {
         super(context, resource, objects);
         this.currentDates = objects;
@@ -66,5 +74,10 @@ public class CalendarAdapter extends ArrayAdapter<DateWithBackground> {
 
     public ArrayList<DateWithBackground> getCurrentDates() {
         return currentDates;
+    }
+
+    public void changeCurrentDates(ArrayList<DateWithBackground> newList){
+        currentDates = newList;
+        notifyDataSetChanged();
     }
 }

@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         //we obtain our custom toolbar
         Toolbar topBar = findViewById(R.id.top_toolbar);
 
-        Drawable hamburguerIcon = ContextCompat.getDrawable(this, R.drawable.baseline_menu_black_18dp);
+        Drawable hamburguerIcon = ContextCompat.getDrawable(this, R.drawable.ic_menu_black_18dp);
 
         topBar.setNavigationIcon(hamburguerIcon);
         //we mark our toolbar as the app bar
@@ -139,8 +139,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.menu_t_action_settings:
+                    case R.id.menu_lnb_action_settings:
                         settingsHandler();
+                        menuItem.setChecked(false);
                         return true;
                     default:
                         return false;
