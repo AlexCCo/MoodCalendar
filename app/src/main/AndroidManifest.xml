@@ -16,6 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Permissions required by GoogleAuthUtil -->
+        <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+        <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+        <uses-permission android:name="android.permission.INTERNET" />
     </application>
 
 </manifest>
