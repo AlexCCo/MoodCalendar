@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="calendar_top_info_height">75dp</dimen>
+    <dimen name="calendar_days_row_height">24dp</dimen>
+    <dimen name="custom_action_bar_size">55dp</dimen>
+
+</resources>

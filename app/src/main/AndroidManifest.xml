@@ -9,7 +9,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
+            <!-- The above sentence could lead to a bad UX. We doesn't really care about it
+             because our app works better in portrait mode than landscape, nonetheless we will
+             still need to take care of some events about lifecycle of the app -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">MoodCalendar</string>
+    <string name="action_settings">settings</string>
+    <!-- days of the week for custom calendar view-->
+    <string name="week_day_1">Mon</string>
+    <string name="week_day_2">Tue</string>
+    <string name="week_day_3">Wen</string>
+    <string name="week_day_4">Thu</string>
+    <string name="week_day_5">Fri</string>
+    <string name="week_day_6">Sat</string>
+    <string name="week_day_7">Sun</string>
+    <!-- image content description for custom calendar view-->
+    <string name="left_arrow">Left_arrow</string>
+    <string name="right_arrow">Right_arrow</string>
 </resources>
