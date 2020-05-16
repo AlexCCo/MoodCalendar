@@ -1,4 +1,4 @@
-package es.ucm.fdi.moodcalendar.dataModel;
+package es.ucm.fdi.moodcalendar.dataModel.entities;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -9,6 +9,8 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.time.LocalDate;
+
+import es.ucm.fdi.moodcalendar.dataModel.MoodSelection;
 
 /**
  * Entity class for representing coloured cells on the calendar.<br>
@@ -21,19 +23,21 @@ import java.time.LocalDate;
 @Entity(tableName = "date_with_background_color")
 public class DateWithBackground implements Parcelable {
     @PrimaryKey
+    @NonNull
     private String date;
     @NonNull
     @ColumnInfo(name = "current_mood")
     private MoodSelection mood;
 
-    public DateWithBackground(LocalDate date, MoodSelection mood){
-        this.date = date.toString();
-        this.mood = mood;
-    }
+    @NonNull
+    @ColumnInfo(name = "comments")
+    private String log;
 
-    public DateWithBackground(LocalDate date){
-        this.date = date.toString();
-        mood = MoodSelection.NOT_MARKED;
+
+    public DateWithBackground(@NonNull String date, @NonNull MoodSelection mood, @NonNull String log) {
+        this.date = date;
+        this.mood = mood;
+        this.log = log;
     }
 
     public DateWithBackground(int year, int month, int day){
@@ -86,6 +90,23 @@ public class DateWithBackground implements Parcelable {
      * */
     public int getMoodColor(){
         return MoodSelection.colorOf(mood);
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    @NonNull
+    public String getLog() {
+        return log;
+    }
+
+    public void setLog(@NonNull String log) {
+        this.log = log;
     }
 
     protected DateWithBackground(Parcel in) {

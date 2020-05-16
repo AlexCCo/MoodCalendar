@@ -1,6 +1,7 @@
 package es.ucm.fdi.moodcalendar;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -8,31 +9,41 @@ import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
+import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import es.ucm.fdi.moodcalendar.customView.CalendarAdapter;
 import es.ucm.fdi.moodcalendar.customView.CalendarView;
 import es.ucm.fdi.moodcalendar.dataModel.DateParcelable;
-import es.ucm.fdi.moodcalendar.dataModel.DateWithBackground;
+import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
+import es.ucm.fdi.moodcalendar.viewModel.MoodCalendarViewModel;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String CURRENT_DATE_BUNDLE = "currentDatesList";
+    private static final String INTENT_EXTRA = "calItem";
+    private static final String INTENT_REPLY = "reply";
+    private static final int MARK_DAY_REQUEST = 1;
     private NavigationView leftNav;
     private DrawerLayout dlLayout;
     private CalendarView calendar;
+    private MoodCalendarViewModel viewModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,18 +74,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //create view model an associate it with this activity
+        viewModel = new ViewModelProvider(this).get(MoodCalendarViewModel.class);
+
+
+        //we start configuring our calendar view
         calendar = new CalendarView(getApplicationContext(), null);
+        final CalendarAdapter adapter = new CalendarAdapter(getApplicationContext(), 0);
 
-        ArrayList<DateWithBackground> savedListDates;
-        if(savedInstanceState == null){
-            savedListDates = new ArrayList<>();
-        } else{
-            DateParcelable parcDate = savedInstanceState.getParcelable(CURRENT_DATE_BUNDLE);
-            savedListDates = parcDate.getDateList();
-        }
+        calendar.attachAdapter(adapter);
 
-        calendar.createView(savedListDates);
+        calendar.getCalendarBody().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView text = view.findViewById(R.id.dateNumber);
 
+                if(Integer.parseInt(text.getText().toString()) != 0) {
+                    Log.d(TAG, "onItemClick: creating the next activity");
+                    Intent intent = new Intent(MainActivity.this, InsertMoodActivity.class);
+                    intent.putExtra(INTENT_EXTRA, adapter.getStringyfiedIn(position));
+
+                    startActivityForResult(intent, MARK_DAY_REQUEST);
+                }
+            }
+        });
+
+        viewModel.getAllDates().observe(this, new Observer<List<DateWithBackground>>() {
+            @Override
+            public void onChanged(List<DateWithBackground> dateWithBackgrounds) {
+                adapter.updateBackground(dateWithBackgrounds);
+            }
+        });
 
         ConstraintLayout visibleContent = findViewById(R.id.dl_content_layout);
         //we will insert a new child to visibleContent
@@ -102,6 +132,17 @@ public class MainActivity extends AppCompatActivity {
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/top_toolbar" />
         * */
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == MARK_DAY_REQUEST && resultCode == RESULT_OK){
+            Log.d(TAG, "onActivityResult: " + data.getStringExtra(INTENT_REPLY));
+            //the answer will be in the form of yyy-mm-dd&moodOrdinal&comments
+            viewModel.insertEntityDate(data.getStringExtra(INTENT_REPLY));
+        }
     }
 
     //when creating the view, the system will call this function once it reaches the toolbar
@@ -160,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         DateParcelable parc = new DateParcelable();
-        parc.setDateList(calendar.getDateLists());
+        //parc.setDateList(calendar.getDateLists());
 
         outState.putParcelable(CURRENT_DATE_BUNDLE, parc);
     }

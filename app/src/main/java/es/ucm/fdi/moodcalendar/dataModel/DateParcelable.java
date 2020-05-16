@@ -3,11 +3,10 @@ package es.ucm.fdi.moodcalendar.dataModel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.List;
+
+import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
 
 /**
  * @see <a href="https://developer.android.com/guide/components/activities/parcelables-and-bundles">Parcelable and Bundles</a>
@@ -16,15 +15,15 @@ import java.util.Enumeration;
  * @see <a href="https://stackoverflow.com/questions/59453520/use-of-classloader-in-parcelable-readarraylist-in-android">Post talking about parcelable</a>
  * */
 public class DateParcelable implements Parcelable {
-    private ArrayList<DateWithBackground> dateList;
+    private List<DateWithBackground> dateList;
 
     public DateParcelable(){}
 
-    public ArrayList<DateWithBackground> getDateList(){
+    public List<DateWithBackground> getDateList(){
         return dateList;
     }
 
-    public void setDateList( ArrayList<DateWithBackground> list){
+    public void setDateList(List<DateWithBackground> list){
         dateList = list;
     }
 

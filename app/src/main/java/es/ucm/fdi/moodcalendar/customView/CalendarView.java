@@ -1,28 +1,25 @@
 package es.ucm.fdi.moodcalendar.customView;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import es.ucm.fdi.moodcalendar.R;
-import es.ucm.fdi.moodcalendar.dataModel.DateWithBackground;
+import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
 
 /**
  * Custom Calendar View
@@ -54,35 +51,125 @@ public class CalendarView extends LinearLayout {
                 "January", "February", "March", "April", "May", "June", "July",
                 "August", "September", "October", "November", "December"
         };
-    }
 
-    public void createView(@NonNull ArrayList<DateWithBackground> dateList){
-        if(dateList.isEmpty()){
-            //TODO: MVV-1: Should it call ViewModel method to retrieve the current
-            //  values inside the database?
-            dateList = obtainCalendarData(CalendarAction.CURRENT);
-        }
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        inflater.inflate(R.layout.mood_calendar_view, this);
+        /*
+        LayoutParams:
+        https://developer.android.com/guide/topics/ui/declaring-layout#layout-params
+        https://developer.android.com/reference/android/view/ViewGroup.LayoutParams
+         */
+        setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0));
+        assignUiElements();
+        changeMonthText();
+        changeYearText();
 
-        initControl(getContext(), dateList);
-        //we give it a new id
         setId(View.generateViewId());
     }
 
-    private ArrayList<DateWithBackground> obtainCalendarData(int month){
+    public GridView getCalendarBody(){
+        return calendarBody;
+    }
+
+    public Calendar getCurrentCalendar(){
+        return currentCalendar;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    public void attachAdapter(CalendarAdapter adapter) {
+        bodyDataAdapter = adapter;
+
+        //TODO: all this calculations could be passed to our CalendarAdapter. This way
+        // we could isolate this view an make it more generic
+        float window = Resources.getSystem().getDisplayMetrics().heightPixels;
+        float itemRowHeight = getResources().getDimension(R.dimen.calendar_days_row_height);
+
+        itemRowHeight += getResources().getDimension(R.dimen.calendar_top_info_height);
+        itemRowHeight += getResources().getDimension(R.dimen.custom_action_bar_size);
+
+        itemRowHeight = window - itemRowHeight;
+        itemRowHeight = itemRowHeight/MAX_ROWS;
+
+        //The height of our items won't fill up the entire screen as we like so we need to do
+        //this workaround to fix it
+        bodyDataAdapter.setContainerHeight(Math.round(itemRowHeight));
+
+        window = Resources.getSystem().getDisplayMetrics().widthPixels;
+        window = window/ MAX_COLUMNS;
+
+        calendarBody.setColumnWidth(Math.round(window+1));
+        calendarBody.setAdapter(bodyDataAdapter);
+
+        //Override this method could lead to a worse UX for visually impaired people.
+        //reference: https://stackoverflow.com/questions/47107105/android-button-has-setontouchlistener-called-on-it-but-does-not-override-perform
+        calendarBody.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return event.getAction() == MotionEvent.ACTION_MOVE;
+            }
+        });
+
+        adapter.setCurrentDates(obtainCalendarData(CalendarAction.CURRENT));
+    }
+
+    /**
+     * This method will initialize all the attributes needed to control calendar's logic
+     * */
+    private void assignUiElements() {
+        // layout is inflated, assign local variables to components
+        headerYearText = findViewById(R.id.CaHeDateInfoYear);
+        headerMonthText = findViewById(R.id.CaHeDateInfoMonth);
+        btnPrev = findViewById(R.id.CaHeaderArrowLeft);
+        btnNext = findViewById(R.id.CaHeaderArrowRight);
+        calendarBody = findViewById(R.id.CalendarBody);
+    }
+
+    //TODO: button listeners outside this class
+
+    private void changeMonthText() {
+        //this value will be in the range of 0 to 11
+        int currentMonth = currentCalendar.get(Calendar.MONTH);
+        headerMonthText.setText(MONTH_TITLES[currentMonth]);
+    }
+
+    private void changeYearText(){
+        int currentYear = currentCalendar.get(Calendar.YEAR);
+        headerYearText.setText(String.valueOf(currentYear));
+    }
+
+    public int getYear(){
+        return currentCalendar.get(Calendar.YEAR);
+    }
+
+    public int getMonth(){
+        return  currentCalendar.get(Calendar.MONTH);
+    }
+
+
+
+
+
+
+
+
+
+
+
+    private ArrayList<CalendarViewItem> obtainCalendarData(int month){
         currentCalendar.set(Calendar.MONTH, month);
         return obtainCalendarData(CalendarAction.CURRENT);
     }
 
-    private ArrayList<DateWithBackground> obtainCalendarData(CalendarAction selectedMonth){
+    private ArrayList<CalendarViewItem> obtainCalendarData(CalendarAction selectedMonth){
         int currentMonth = currentCalendar.get(Calendar.MONTH);
         currentCalendar.set(Calendar.MONTH,  currentMonth + selectedMonth.value);
 
         int currentDay = currentCalendar.get(Calendar.DAY_OF_MONTH);
-        ArrayList<DateWithBackground> monthDays = new ArrayList<>();
+        ArrayList<CalendarViewItem> monthDays = new ArrayList<>();
 
         for(int i = 0; i < MAX_ROWS ; i++){
             for (int j = 0; j < MAX_COLUMNS; j++){
-                monthDays.add(new DateWithBackground(currentCalendar.get(Calendar.YEAR), currentMonth+1, 0));
+                monthDays.add(new CalendarViewItem(currentCalendar.get(Calendar.YEAR), currentMonth+1, 0));
             }
         }
 
@@ -143,128 +230,24 @@ public class CalendarView extends LinearLayout {
     }
 
 
-    /**
-     * This method will initialize all the attributes needed to control calendar's logic
-     * */
-    private void assignUiElements() {
-        // layout is inflated, assign local variables to components
-        headerYearText = findViewById(R.id.CaHeDateInfoYear);
-        headerMonthText = findViewById(R.id.CaHeDateInfoMonth);
-        btnPrev = findViewById(R.id.CaHeaderArrowLeft);
-        btnNext = findViewById(R.id.CaHeaderArrowRight);
-        calendarBody = findViewById(R.id.CalendarBody);
 
-        createBtnListeners();
-    }
 
-    private void createBtnListeners(){
-        btnPrev.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //call to update view
-                Log.d(TAG, "onClick: click previous month");
-                bodyDataAdapter.changeCurrentDates(obtainCalendarData(CalendarAction.PREVIOUS));
-                changeMonthText();
-            }
-        });
-        btnNext.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //call to update view
-                Log.d(TAG, "onClick: clicked next month");
-                bodyDataAdapter.changeCurrentDates(obtainCalendarData(CalendarAction.NEXT));
-                changeMonthText();
-            }
-        });
-    }
 
-    private void changeMonthText() {
-        //this value will be in the range of 0 to 11
-        int currentMonth = currentCalendar.get(Calendar.MONTH);
-        headerMonthText.setText(MONTH_TITLES[currentMonth]);
-    }
 
-    private void changeYearText(){
-        int currentYear = currentCalendar.get(Calendar.YEAR);
-        headerYearText.setText(String.valueOf(currentYear));
-    }
-
-    /**
-     * It will associate the layout to this class and will initialize the attributes
-     * @param context
-     * @param attrs
-     */
-    private void initControl(Context context, ArrayList<DateWithBackground> attrs) {
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        inflater.inflate(R.layout.mood_calendar_view, this);
-        /*
-        LayoutParams:
-        https://developer.android.com/guide/topics/ui/declaring-layout#layout-params
-        https://developer.android.com/reference/android/view/ViewGroup.LayoutParams
-         */
-        setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, 0));
-        assignUiElements();
-        attachAdapter(attrs);
-        changeMonthText();
-        changeYearText();
-    }
-
-    private void attachAdapter(ArrayList<DateWithBackground> datesList) {
-        bodyDataAdapter = new CalendarAdapter(getContext(), 0, datesList);
-
-        //TODO: all this calculations could be passed to our CalendarAdapter. This way
-        // we could isolate this view an make it more generic
-        float window = Resources.getSystem().getDisplayMetrics().heightPixels;
-        float itemRowHeight = getResources().getDimension(R.dimen.calendar_days_row_height);
-
-        itemRowHeight += getResources().getDimension(R.dimen.calendar_top_info_height);
-        itemRowHeight += getResources().getDimension(R.dimen.custom_action_bar_size);
-
-        itemRowHeight = window - itemRowHeight;
-        itemRowHeight = itemRowHeight/MAX_ROWS;
-
-        //The height of our items won't fill up the entire screen as we like so we need to do
-        //this workaround to fix it
-        bodyDataAdapter.setContainerHeight(Math.round(itemRowHeight));
-
-        window = Resources.getSystem().getDisplayMetrics().widthPixels;
-        window = window/ MAX_COLUMNS;
-
-        calendarBody.setColumnWidth(Math.round(window+1));
-        calendarBody.setAdapter(bodyDataAdapter);
-
-        //Override this method could lead to a worse UX for visually impaired people.
-        //reference: https://stackoverflow.com/questions/47107105/android-button-has-setontouchlistener-called-on-it-but-does-not-override-perform
-        calendarBody.setOnTouchListener(new OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return event.getAction() == MotionEvent.ACTION_MOVE;
-            }
-        });
-
-        calendarBody.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(TAG, "onItemClick: " + ((TextView)view.findViewById(R.id.dateNumber)).getText());
-
-                view.setBackgroundColor(getResources().getColor(R.color.teal_green, null));
-            }
-        });
-    }
 
     /*======================= GETTERS =======================*/
 
-    public ArrayList<DateWithBackground> getDateLists(){
+    public List<CalendarViewItem> getDateLists(){
         return bodyDataAdapter.getCurrentDates();
     }
 
     /*======================= TEST METHODS =======================*/
 
-    public ArrayList<DateWithBackground> obtainCalendarDataGivenMonthUNIT_TEST(int month){
+    public ArrayList<CalendarViewItem> obtainCalendarDataGivenMonthUNIT_TEST(int month){
         return obtainCalendarData(month);
     }
 
-    public ArrayList<DateWithBackground> obtainCalendarDataUNIT_TEST(){
+    public ArrayList<CalendarViewItem> obtainCalendarDataUNIT_TEST(){
         return obtainCalendarData(CalendarAction.CURRENT);
     }
 

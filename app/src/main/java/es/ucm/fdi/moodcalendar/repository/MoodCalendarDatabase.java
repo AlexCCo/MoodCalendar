@@ -2,18 +2,27 @@ package es.ucm.fdi.moodcalendar.repository;
 
 import android.content.Context;
 
+import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
+import es.ucm.fdi.moodcalendar.dataModel.MoodConverterType;
+import es.ucm.fdi.moodcalendar.dataModel.entities.User;
 
 /**
  * An abstract class encapsulating all the logic for represent our app database.<br>
  * Room will take care of the implementation
  *
  * @author Alejandro Cancelo Correia
+ * @author Marina Payo
  * */
+@TypeConverters({MoodConverterType.class})
+@Database( entities = {User.class, DateWithBackground.class}, version = 1, exportSchema = false)
 public abstract class MoodCalendarDatabase extends RoomDatabase {
     /**
      * The database will be shared among all background threads because
@@ -42,6 +51,7 @@ public abstract class MoodCalendarDatabase extends RoomDatabase {
      * */
     public abstract DateWithBackgroundDAO dateDao();
 
+    public abstract DaoUser userDao();
 
     /**
      * It will return just one instance of DateWithBackgroundDatabase

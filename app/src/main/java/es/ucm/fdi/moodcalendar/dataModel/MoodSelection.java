@@ -19,7 +19,7 @@ public enum MoodSelection {
             case REALLY_SAD:
                 return R.color.purple4;
             case SAD:
-                return Color.GRAY;
+                return R.color.gray;
             case NORMAL:
                 return R.color.diamond_blue;
             case HAPPY:
@@ -27,7 +27,20 @@ public enum MoodSelection {
             case SO_HAPPY:
                 return R.color.teal_green;
             default:
-                return Color.WHITE;
+                return R.color.white;
         }
+    }
+    //TODO: MoodSelection: document methods
+    public static MoodSelection valueOf(int val){
+        MoodSelection mVal = null;
+
+        for(MoodSelection moodVal : MoodSelection.values()){
+            if(moodVal.ordinal() == val){
+                mVal = moodVal;
+                break;
+            }
+        }
+
+        return mVal;
     }
 }

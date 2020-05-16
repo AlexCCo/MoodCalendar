@@ -8,7 +8,7 @@ import androidx.room.Query;
 
 import java.util.List;
 
-import es.ucm.fdi.moodcalendar.dataModel.DateWithBackground;
+import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
 
 /**
  * DAO object with the unique purpose of accessing to our database
@@ -22,7 +22,7 @@ public interface DateWithBackgroundDAO {
      * It will insert the given date into the database.<br>
      * If that value already exists, it will replace it
      * */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(entity = DateWithBackground.class ,onConflict = OnConflictStrategy.REPLACE)
     public void insertDate(DateWithBackground date);
 
     /**
@@ -37,6 +37,8 @@ public interface DateWithBackgroundDAO {
     @Query("SELECT * FROM date_with_background_color WHERE date LIKE  :year || '-' || :month || '-%'")
     public LiveData<List<DateWithBackground>> queryDatesByYearAndMonth(int year, int month);
 
+    @Query("SELECT * FROM date_with_background_color")
+    public LiveData<List<DateWithBackground>> queryAllDates();
     /**
      * We make it to return a LiveData object because Room will take care of
      * notify all observers when the database state change

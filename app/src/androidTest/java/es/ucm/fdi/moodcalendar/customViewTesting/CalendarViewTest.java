@@ -4,13 +4,10 @@ import android.app.Instrumentation;
 import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
-import androidx.test.rule.ActivityTestRule;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,9 +15,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import es.ucm.fdi.moodcalendar.MainActivity;
 import es.ucm.fdi.moodcalendar.customView.CalendarView;
-import es.ucm.fdi.moodcalendar.dataModel.DateWithBackground;
+import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
 
 /**
  * @see <a href="https://developer.android.com/training/testing/junit-rules">junit-rules</a>
