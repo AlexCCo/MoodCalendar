@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -29,12 +30,12 @@ public class DateWithBackground implements Parcelable {
     @ColumnInfo(name = "current_mood")
     private MoodSelection mood;
 
-    @NonNull
+    @Nullable
     @ColumnInfo(name = "comments")
     private String log;
 
 
-    public DateWithBackground(@NonNull String date, @NonNull MoodSelection mood, @NonNull String log) {
+    public DateWithBackground(@NonNull String date, @NonNull MoodSelection mood, @Nullable String log) {
         this.date = date;
         this.mood = mood;
         this.log = log;
@@ -100,9 +101,12 @@ public class DateWithBackground implements Parcelable {
         this.date = date;
     }
 
-    @NonNull
     public String getLog() {
         return log;
+    }
+
+    public String getStringVersion(){
+        return date + "&" + mood.ordinal() + "&" + log;
     }
 
     public void setLog(@NonNull String log) {

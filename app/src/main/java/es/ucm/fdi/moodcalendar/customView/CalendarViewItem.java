@@ -1,56 +1,127 @@
 package es.ucm.fdi.moodcalendar.customView;
 
-import android.graphics.Color;
-
 import es.ucm.fdi.moodcalendar.R;
 
-public class CalendarViewItem {
+/**
+ * Class which acts a a container of the UI data that any CalendarAdapter will display
+ * inside the CalendarView object in which it is attached to
+ *
+ * @see CalendarView
+ * @see CalendarAdapter
+ *
+ * @author Alejandro Cancelo Correia
+ * */
+class CalendarViewItem {
+    /**
+     * Year if the cell that the CalendarAdapter will hold
+     * */
     private int year;
+    /**
+     * Month if the cell that the CalendarAdapter will hold
+     * */
     private int month;
+    /**
+     * Day if the cell that the CalendarAdapter will hold and display
+     * */
     private int day;
+    /**
+     * Id of the color background displayed
+     * */
     private int colorId;
+    /**
+     * Each cell displayed by CalendarAdapter has two states <i>"Marked"</i> and
+     * <i>"Not Marked"</i> being the last the default state when creating this object.<br>
+     * This object can transition to <i>"Marked"</i> when the user click a cell and insert
+     * data.<br><br>
+     * This value will tell in which state this object is (false -> Not Marked | true -> Marked)
+     * */
+    private boolean marked;
 
-    public CalendarViewItem(int year, int month, int day) {
+    /**
+     * This class's constructor only needs the year, month and day of the date the resulting object
+     * is representing
+     * */
+    CalendarViewItem(int year, int month, int day) {
         this.year = year;
         this.month = month;
         this.day = day;
         colorId = R.color.white;
+        marked = false;
     }
 
+    /**
+     * @return true if this object is in <i>"Marked"</i> and false if not
+     * */
+    boolean isMarked() {
+        return marked;
+    }
 
-    public int getYear() {
+    /**
+     * Let you change the sate of this object.<br>
+     *
+     * @param marked It only accepts true (Mark this object)
+     * */
+    void setMarked(boolean marked) {
+        if(marked) {
+            this.marked = marked;
+        }
+    }
+
+    /**
+     * Get year
+     * */
+    int getYear() {
         return year;
     }
 
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public int getMonth() {
+    /**
+     * Get month
+     * */
+    int getMonth() {
         return month;
     }
 
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getDay() {
+    /**
+     * Get day
+     * */
+    int getDay() {
         return day;
     }
 
-    public void setDay(int day) {
-        this.day = day;
+    /**
+     * Changes the day of this object
+     *
+     * @param day The we want this object to have.<br>
+     *            Accepted values 0 <= day <= 31
+     * */
+    void setDay(int day) {
+        if(day >= 0 && day <= 31){
+            this.day = day;
+        }
     }
 
-    public int getColorId() {
+    /**
+     * Get the background color id
+     * */
+    int getColorId() {
         return colorId;
     }
 
-    public void setColorId(int colorId) {
+    /**
+     * Change the background color id
+     * */
+    void setColorId(int colorId) {
         this.colorId = colorId;
     }
 
-    public String stringify() {
-        return String.format("%d-%d-%d", year, month, day);
+    /**
+     * It will return a string version of the date this object represent.<br>
+     *
+     * @return The string version is in the form of "YYYY-MM-DD"<br><br>
+     *     <i>Example:</i> "2020-5-20"
+     * */
+    String stringify() {
+        return year + "-" + month + "-" + day;
     }
+
 }

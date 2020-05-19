@@ -9,49 +9,19 @@ import java.util.List;
 
 import es.ucm.fdi.moodcalendar.dataModel.MoodSelection;
 import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
-import es.ucm.fdi.moodcalendar.dataModel.entities.User;
+import es.ucm.fdi.moodcalendar.viewModel.DriveServiceHelper;
 
 public class MoodCalendarRepository {
     private static final String TAG = "MoodCalendarRepository";
-    private DaoUser daoUser;
     private DateWithBackgroundDAO dwbDao;
-    //Gets
-    private User user;
 
     public MoodCalendarRepository(Application application) {
         MoodCalendarDatabase db = MoodCalendarDatabase.getDatabase(application);
-        daoUser = db.userDao();
         dwbDao = db.dateDao();
     }
-
-
-    //Insert
-    public void insertUser(User u){
-          daoUser.insertNewUser(u);
-    }
-
-    //Update
-    public void updateUser(User u){
-        daoUser.updateUser(u);
-    }
-
-    //Delete
-    public void deleteUser(User u){
-       daoUser.deleteUser(u);
-    }
-
-    //Show
-    public LiveData<User> getUserbyname(String username){
-        return daoUser.getUserbyId(username);
-    }
-
     //TODO: document
     public LiveData<List<DateWithBackground>> getDatesByYearAndMonth(int year, int month){
         return dwbDao.queryDatesByYearAndMonth(year, month);
-    }
-
-    public LiveData<List<DateWithBackground>> getAllDates(){
-        return dwbDao.queryAllDates();
     }
 
     public void insertDate(final String toParse) {
@@ -60,9 +30,55 @@ public class MoodCalendarRepository {
             public void run() {
                 String[] response = toParse.split("&");
                 MoodSelection sel = MoodSelection.valueOf(Integer.parseInt(response[1]));
-                DateWithBackground dataToInsert = new DateWithBackground(response[0], sel, response[2]);
-                Log.d(TAG, "run: " + response[0] + "|" + sel.name() + "|" + response[2]);
+
+                String comment = response.length <= 2 ? "No entry added" : response[2];
+
+                DateWithBackground dataToInsert = new DateWithBackground(response[0], sel, comment);
+                Log.d(TAG, "run: " + response[0] + "|" + sel.name() + "|" + comment);
                 dwbDao.insertDate(dataToInsert);
+            }
+        });
+    }
+
+    public void parseAndInsert(final String toParse) {
+        MoodCalendarDatabase.databaseAccessExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if(toParse.isEmpty()){
+                    return;
+                }
+
+                String[] rawListData = toParse.split(":");
+                Log.d(TAG, "parseAndInsert.run: toParse=" + toParse);
+                for (int i = 0; i < rawListData.length; i++) {
+                    String[] response = rawListData[i].split("&");
+
+                    MoodSelection sel = MoodSelection.valueOf(Integer.parseInt(response[1]));
+
+                    String comment = response.length <= 2 ? "No entry added" : response[2];
+
+                    DateWithBackground dataToInsert = new DateWithBackground(response[0], sel, comment);
+                    Log.d(TAG, "run: " + response[0] + "|" + sel.name() + "|" + comment);
+                    dwbDao.insertDate(dataToInsert);
+                }
+            }
+        });
+    }
+
+    public void storeInDrive(final DriveServiceHelper driveService, final String fileId) {
+        MoodCalendarDatabase.databaseAccessExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<DateWithBackground> dates = dwbDao.queryAllDates();
+
+                StringBuilder builder = new StringBuilder();
+
+                for (DateWithBackground dwb: dates) {
+                    builder.append(dwb.getStringVersion());
+                    builder.append(":");
+                }
+                Log.i(TAG, "storeInDrive.run: storing data in drive file");
+                driveService.saveFile(fileId, builder.toString());
             }
         });
     }

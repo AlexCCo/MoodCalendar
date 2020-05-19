@@ -17,12 +17,13 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Observer;
 
 import es.ucm.fdi.moodcalendar.R;
 import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
 
 /**
- * Custom Calendar View
+ * Custom Calendar View.<br>
  *
  * @author Alejandro Cancelo Correia
  * */
@@ -31,19 +32,40 @@ public class CalendarView extends LinearLayout {
     private final int MAX_ROWS = 6;
     private final int MAX_COLUMNS = 7;
 
+    /**
+     * TextView displaying the Year of the current calendar
+     * */
     private TextView headerYearText;
+    /**
+     * TextView displaying the month of the current calendar
+     * */
     private TextView headerMonthText;
-    //arrow left
+    /**
+     * Arrow left image representing a button to change to the previous month
+     * */
     private ImageView btnPrev;
-    //arrow right
+    /**
+     * Arrow right image representing a button to change to the next month
+     * */
     private ImageView btnNext;
-    //Calendar body
+    /**
+     * Body of this calendar view, it will display the dates of the current month and year
+     * */
     private GridView calendarBody;
+    /**
+     * Adapter needed to display the body of this view
+     * */
     private CalendarAdapter bodyDataAdapter;
+    /**
+     * Calendar object to help us calculate the dates of the current month, the current month
+     * and the current year
+     * */
     private Calendar currentCalendar;
     private String[] MONTH_TITLES;
 
-    //TODO: CalendarView: Document each method
+    /**
+     *
+     * */
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
         currentCalendar = Calendar.getInstance();
@@ -146,14 +168,30 @@ public class CalendarView extends LinearLayout {
     }
 
 
+    public void createBtnListeners(boolean type,final Observer callback){
+        if(type) {
+            btnNext.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    bodyDataAdapter.setCurrentDates(obtainCalendarData(CalendarAction.NEXT));
+                    changeMonthText();
+                    callback.update(null, new UpdateDateTransfer(currentCalendar.get(Calendar.YEAR),
+                                                                    currentCalendar.get(Calendar.MONTH)+1));
+                }
+            });
+        }else{
+            btnPrev.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    bodyDataAdapter.setCurrentDates(obtainCalendarData(CalendarAction.PREVIOUS));
+                    changeMonthText();
+                    callback.update(null, new UpdateDateTransfer(currentCalendar.get(Calendar.YEAR),
+                                                                    currentCalendar.get(Calendar.MONTH)+1));
+                }
+            });
+        }
 
-
-
-
-
-
-
-
+    }
 
     private ArrayList<CalendarViewItem> obtainCalendarData(int month){
         currentCalendar.set(Calendar.MONTH, month);
@@ -163,6 +201,7 @@ public class CalendarView extends LinearLayout {
     private ArrayList<CalendarViewItem> obtainCalendarData(CalendarAction selectedMonth){
         int currentMonth = currentCalendar.get(Calendar.MONTH);
         currentCalendar.set(Calendar.MONTH,  currentMonth + selectedMonth.value);
+        currentMonth = currentCalendar.get(Calendar.MONTH);
 
         int currentDay = currentCalendar.get(Calendar.DAY_OF_MONTH);
         ArrayList<CalendarViewItem> monthDays = new ArrayList<>();
@@ -278,4 +317,21 @@ public class CalendarView extends LinearLayout {
         }
     }
 
+    public static class UpdateDateTransfer {
+        private int year;
+        private int month;
+
+        public UpdateDateTransfer(int year, int month) {
+            this.year = year;
+            this.month = month;
+        }
+
+        public int getYear() {
+            return year;
+        }
+
+        public int getMonth() {
+            return month;
+        }
+    }
 }

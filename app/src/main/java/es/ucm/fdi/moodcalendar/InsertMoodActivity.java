@@ -75,7 +75,7 @@ public class InsertMoodActivity extends AppCompatActivity {
         responseBuilder.append(selection.ordinal());
         responseBuilder.append("&");
 
-        responseBuilder.append(comm.isEmpty()?"_": comm);
+        responseBuilder.append(comm);
 
         return responseBuilder.toString();
     }

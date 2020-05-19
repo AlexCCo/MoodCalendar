@@ -2,6 +2,7 @@ package es.ucm.fdi.moodcalendar.repository;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -34,26 +35,18 @@ public interface DateWithBackgroundDAO {
      * We make it to return a LiveData object because Room will take care of
      * notify all observers when the database state change
      */
-    @Query("SELECT * FROM date_with_background_color WHERE date LIKE  :year || '-' || :month || '-%'")
+    @Query("SELECT * FROM date_with_background_color WHERE date LIKE  :year || \"-\" || :month || \"-%\"")
     public LiveData<List<DateWithBackground>> queryDatesByYearAndMonth(int year, int month);
 
     @Query("SELECT * FROM date_with_background_color")
-    public LiveData<List<DateWithBackground>> queryAllDates();
+    public List<DateWithBackground> queryAllDates();
     /**
      * We make it to return a LiveData object because Room will take care of
      * notify all observers when the database state change
      * */
-    @Query("SELECT * FROM date_with_background_color WHERE date LIKE :year || '-%-%'")
+    @Query("SELECT * FROM date_with_background_color WHERE date LIKE :year || \"-%-%\"")
     public LiveData<List<DateWithBackground>> queryDatesByYear(int year);
 
-    /**
-     * It will retrieve just one calendar cell.<br>
-     * We make it to return a LiveData object because Room will take care of
-     * notify all observers when the database state change
-     *
-     * @param date This string must be in the form of "YYYY-MM-DD" or the query
-     *             will retrieve nothing
-     * */
-    @Query("SELECT * FROM date_with_background_color WHERE date = :date")
-    public LiveData<DateWithBackground> queryJustOneDate(String date);
+    @Query("DELETE FROM date_with_background_color")
+    public void deletedAllData();
 }

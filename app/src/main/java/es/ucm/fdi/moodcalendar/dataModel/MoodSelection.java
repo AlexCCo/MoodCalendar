@@ -43,4 +43,15 @@ public enum MoodSelection {
 
         return mVal;
     }
+
+    public static String nameOf(MoodSelection mood){
+        switch (mood){
+            case REALLY_SAD: return "Really Sad :(";
+            case SO_HAPPY: return "Really Happy :)";
+            case NORMAL: return "Normal";
+            case HAPPY: return "Happy";
+            case SAD: return "Sad";
+            default: return "...";
+        }
+    }
 }
