@@ -22,7 +22,11 @@ import es.ucm.fdi.moodcalendar.dataModel.MoodSelection;
  * @see LocalDate
  * */
 @Entity(tableName = "date_with_background_color")
-public class DateWithBackground implements Parcelable {
+public class DateWithBackground {
+    /**
+     * date of the object in format "YYYY-MM-DD"<br><br>
+     * <i>Example:</i> "2020-5-25"
+     * */
     @PrimaryKey
     @NonNull
     private String date;
@@ -30,20 +34,24 @@ public class DateWithBackground implements Parcelable {
     @ColumnInfo(name = "current_mood")
     private MoodSelection mood;
 
+    /**
+     * A String containing all the comments a user made for one specific date
+     * */
     @Nullable
     @ColumnInfo(name = "comments")
     private String log;
 
-
+    /**
+     * It will create a DateWithBackground object with a date, mood and thoughts of the user
+     *
+     * @param date A string date in the format of "YYYY-MM-DD"
+     * @param mood A mood value representing the felling of the user in the corresponding date
+     * @param log A string with the comments/thoughts the user made for the corresponding date
+     * */
     public DateWithBackground(@NonNull String date, @NonNull MoodSelection mood, @Nullable String log) {
         this.date = date;
         this.mood = mood;
         this.log = log;
-    }
-
-    public DateWithBackground(int year, int month, int day){
-        this.date = String.format("%d-%d-%d", year, month, day);
-        mood = MoodSelection.NOT_MARKED;
     }
 
     /**
@@ -80,66 +88,34 @@ public class DateWithBackground implements Parcelable {
     }
 
     /**
-     * Sets mood to the given value
-     * */
-    public void setMood(MoodSelection mood) {
-        this.mood = mood;
-    }
-
-    /**
      * Get color representing the mood value
      * */
     public int getMoodColor(){
         return MoodSelection.colorOf(mood);
     }
 
+    /**
+     * Get the entire string representing the date.<br>
+     * This string is in the form of "YYYY-MM-DD"
+     * */
     public String getDate() {
         return date;
     }
 
-    public void setDate(String date) {
-        this.date = date;
-    }
-
+    /**
+     * Get the user's thought for this object date
+     * */
     public String getLog() {
         return log;
     }
 
+    /**
+     * It will retrieve a string version of the important values.<br>
+     * The result will be in the form of: YYYY-MM-DD&mood-ordinal-value&thoughts<br><br>
+     *
+     * <i>Example:</i> 2020-5-25&2&This day could be worse
+     * */
     public String getStringVersion(){
         return date + "&" + mood.ordinal() + "&" + log;
     }
-
-    public void setLog(@NonNull String log) {
-        this.log = log;
-    }
-
-    protected DateWithBackground(Parcel in) {
-        date = date.replaceFirst("[0-9]{1,}$", String.valueOf(in.readInt()));
-        mood = (MoodSelection) in.readValue(MoodSelection.class.getClassLoader());
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        String[] fields = date.split("-");
-        dest.writeInt(Integer.parseInt(fields[2]));
-        dest.writeValue(mood);
-    }
-
-    @SuppressWarnings("unused")
-    public static final Parcelable.Creator<DateWithBackground> CREATOR = new Parcelable.Creator<DateWithBackground>() {
-        @Override
-        public DateWithBackground createFromParcel(Parcel in) {
-            return new DateWithBackground(in);
-        }
-
-        @Override
-        public DateWithBackground[] newArray(int size) {
-            return new DateWithBackground[size];
-        }
-    };
 }

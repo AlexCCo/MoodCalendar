@@ -17,7 +17,6 @@ import es.ucm.fdi.moodcalendar.dataModel.MoodConverterType;
  * An abstract class encapsulating all the logic for represent our app database.<br>
  * Room will take care of the implementation
  *
- * @author Alejandro Cancelo Correia
  * */
 @TypeConverters({MoodConverterType.class})
 @Database( entities = {DateWithBackground.class}, version = 1, exportSchema = false)

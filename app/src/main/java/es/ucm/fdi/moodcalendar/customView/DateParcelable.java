@@ -1,4 +1,4 @@
-package es.ucm.fdi.moodcalendar.dataModel;
+package es.ucm.fdi.moodcalendar.customView;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,6 +14,7 @@ import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
  * @see <a href="http://www.parcelabler.com/">Web to create a Parcelable object easier</a>
  * @see <a href="https://stackoverflow.com/questions/59453520/use-of-classloader-in-parcelable-readarraylist-in-android">Post talking about parcelable</a>
  * */
+//TODO: implement support for landscape mode for our custom CalendarView
 public class DateParcelable implements Parcelable {
     private List<DateWithBackground> dateList;
 

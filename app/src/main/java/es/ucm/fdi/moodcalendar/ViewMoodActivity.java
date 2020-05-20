@@ -7,6 +7,10 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * Activity for visualizing the information entered by a user in a
+ * specific day
+ * */
 public class ViewMoodActivity extends AppCompatActivity {
     private static final String TAG = "ViewMoodActivity";
     private static final String INTENT_EXTRA_VIEW = "calItemView";
@@ -18,6 +22,9 @@ public class ViewMoodActivity extends AppCompatActivity {
 
         Intent given = getIntent();
 
+        //it will receive data from MainActivity in the format of;
+        //mood-string-associated-with-its-ordinal&thoughts
+        //example:  Bad&i didn't pass my last test
         String[] parameters = given.getStringExtra(INTENT_EXTRA_VIEW).split("&");
 
         ((TextView)findViewById(R.id.moodSelected)).setText(parameters[0]);

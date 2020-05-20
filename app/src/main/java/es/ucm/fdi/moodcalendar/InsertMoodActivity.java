@@ -12,10 +12,30 @@ import android.widget.RadioGroup;
 
 import es.ucm.fdi.moodcalendar.dataModel.MoodSelection;
 
+/**
+ * Activity that allows the user to insert how they felt during the day and
+ * write some thoughts about the day.<br>
+ * It will return the results to MainActivity
+ *
+ * @see MainActivity
+ * */
 public class InsertMoodActivity extends AppCompatActivity {
+    /**
+     * String identifying intent data from MainActivity
+     * */
     private static final String INTENT_EXTRA = "calItem";
+    /**
+     * String identifying a response data from this activity
+     * */
     private static final String INTENT_REPLY = "reply";
+    /**
+     * Group of items that can be checked. Those items represent
+     * the available mood state a user can insert for a day
+     * */
     private RadioGroup group;
+    /**
+     * Comments or thoughts about the current day
+     * */
     private EditText comments;
 
     @Override
@@ -44,6 +64,16 @@ public class InsertMoodActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * It will process is a user clicked accept or reject buttons.<br>
+     * The "accept" button will give back a response to MainActivity, the
+     * reject button will simply finish this activity and give no response
+     * to MainActivity
+     *
+     * @param accept A boolean denoting if a user clicked accept (true) or
+     *               reject (false)
+     *
+     * */
     private void processAnswers(boolean accept){
         if(!accept){
             setResult(RESULT_CANCELED);
@@ -57,6 +87,15 @@ public class InsertMoodActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Method for obtaining what information a user have inserted.<br>
+     * It will construct the result as a string with the following format:<br>
+     *     <pre>"YYYY-MM-DD&mood-selection-ordinal&comments"</pre>
+     * <i>Example:</i> "2020-5-28&0&It was SUPER nice day"<br><br>
+     *
+     * The values of "YYYY-MM-DD" are provided by the MainActivity
+     *
+     * */
     private String getResult() {
         StringBuilder responseBuilder = new StringBuilder();
         String comm = comments.getText().toString();

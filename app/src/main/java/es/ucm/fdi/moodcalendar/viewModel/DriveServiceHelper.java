@@ -50,7 +50,6 @@ import java.util.concurrent.Executors;
 public class DriveServiceHelper {
     //      ************************************************
     //         Edited values by Alejandro Cancelo Correia
-    //TODO: change name
     private final String JSON_MYME = "text/plain";
     private final String APP_FOLDER;
     private final String SEARCH_SPACE;

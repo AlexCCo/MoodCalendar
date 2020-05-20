@@ -14,7 +14,6 @@ import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
 /**
  * DAO object with the unique purpose of accessing to our database
  *
- * @author Alejandro Cancelo Correia
  * */
 @Dao
 public interface DateWithBackgroundDAO {
