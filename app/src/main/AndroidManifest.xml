@@ -28,12 +28,15 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait">
-
+            >
+            <!-- android:screenOrientation="portrait"-->
             <!--
              The above sentence could lead to a bad UX. We doesn't really care about it
              because our app works better in portrait mode than landscape, nonetheless we will
              still need to take care of some events about lifecycle of the app
+
+             Edit: This Activity is still better in portrait mode, but it works in
+             landscape mode too
             -->
         </activity>
     </application>

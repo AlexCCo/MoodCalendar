@@ -35,7 +35,6 @@ import java.util.Observable;
 
 import es.ucm.fdi.moodcalendar.customView.CalendarAdapter;
 import es.ucm.fdi.moodcalendar.customView.CalendarView;
-import es.ucm.fdi.moodcalendar.customView.DateParcelable;
 import es.ucm.fdi.moodcalendar.dataModel.MoodSelection;
 import es.ucm.fdi.moodcalendar.dataModel.entities.DateWithBackground;
 import es.ucm.fdi.moodcalendar.viewModel.MoodCalendarViewModel;
@@ -388,25 +387,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void settingsHandler(){
-        Log.d(TAG, "settings selected!");
+        finish();
     }
 
-    //              TESTING
-    //   it will help with changing screen orientation
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        DateParcelable parc = new DateParcelable();
-        //parc.setDateList(calendar.getDateLists());
-
-        outState.putParcelable(CURRENT_DATE_BUNDLE, parc);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-
-    }
 }

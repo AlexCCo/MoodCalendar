@@ -37,7 +37,9 @@ public abstract class MoodCalendarDatabase extends RoomDatabase {
     /**
      * The Executor Service will take care of managing all background threads
      * creating an abstract layer to you. You don't need, then, to track every
-     * thread progress
+     * thread progress.<br>
+     * We use it because <b>you are not allowed</b> to do heavy stuff like querying
+     * data in the main thread, which is the UI thread
      * */
     static final ExecutorService databaseAccessExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 

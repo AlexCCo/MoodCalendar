@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/logInActivity3">
+    <activity
+        android:id="@+id/logInActivity3"
+        android:name="es.ucm.fdi.moodcalendar.LogInActivity"
+        android:label="LogInActivity"
+        tools:layout="@layout/activity_log_in">
+        <action
+            android:id="@+id/action_logInActivity3_to_mainActivity2"
+            app:destination="@id/mainActivity2" />
+    </activity>
+    <activity
+        android:id="@+id/mainActivity2"
+        android:name="es.ucm.fdi.moodcalendar.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" >
+        <action
+            android:id="@+id/action_mainActivity2_to_insertMoodActivity"
+            app:destination="@id/insertMoodActivity" />
+        <action
+            android:id="@+id/action_mainActivity2_to_viewMoodActivity"
+            app:destination="@id/viewMoodActivity" />
+    </activity>
+    <activity
+        android:id="@+id/insertMoodActivity"
+        android:name="es.ucm.fdi.moodcalendar.InsertMoodActivity"
+        android:label="activity_insert_mood"
+        tools:layout="@layout/activity_insert_mood" />
+    <activity
+        android:id="@+id/viewMoodActivity"
+        android:name="es.ucm.fdi.moodcalendar.ViewMoodActivity"
+        android:label="ViewMoodActivity"
+        tools:layout="@layout/activity_view_mood"/>
+</navigation>
